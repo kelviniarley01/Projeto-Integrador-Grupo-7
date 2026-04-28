@@ -1,47 +1,38 @@
 import db from '../database/database';
-import {usuarios} from '../models/usuarios';
+import { usuarios } from '../models/usuarios';
 
-export class UsuariosRepository {;
-    salvar(usuario: usuarios): usuarios {
-        const result = db
-        .prepare('INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario, idade_usuario, data_cadastro_ususrio, rua, numero, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        .run(usuario.nome_usuario, usuario.email_usuario, usuario.senha_usuario, usuario.idade_usuario, new Date(), usuario.rua, usuario.numero, usuario.cidade, usuario.estado);
-
-        return {...usuario, id_usuario: result.lastInsertRowid as number};
-    }
+export class UsuariosRepository {
 
     listar(): usuarios[] {
-        const result = db.prepare('SELECT * FROM usuarios').all();
-        return result as usuarios[];
+        return db.prepare('SELECT * FROM usuarios').all() as usuarios[];
     }
 
-    buscarPorId(id_usuario: number): usuarios | null {
-        const result = db.prepare('SELECT * FROM usuarios WHERE id_usuario = ?').get(id_usuario);
-        return result as usuarios || null;
+    listarPorCidade(cidade: string): usuarios[] {
+        return db.prepare('SELECT * FROM usuarios WHERE cidade = ?').all(cidade) as usuarios[];
     }
 
-    buscarPorEmail(email_usuario: string): usuarios | null {
-        const result = db.prepare('SELECT * FROM usuarios WHERE email_usuario = ?').get(email_usuario);
-        return result as usuarios || null;
+    listarPorIdade(min: number, max: number): usuarios[] {
+        return db
+            .prepare('SELECT * FROM usuarios WHERE idade_usuario BETWEEN ? AND ? ORDER BY nome_usuario ASC')
+            .all(min, max) as usuarios[];
     }
 
-    buscarPorNome(nome_usuario: string): usuarios[] {
-        const result = db.prepare('SELECT * FROM usuarios WHERE nome_usuario LIKE ?').all(`%${nome_usuario}%`);
-        return result as usuarios[];
+    buscarPedidos() {
+        return db.prepare(`
+            SELECT pedidos.id_pedido, usuarios.nome_usuario, pedidos.valor_total, pedidos.status
+            FROM pedidos
+            JOIN usuarios ON pedidos.nome_usuario = usuarios.nome_usuario
+            ORDER BY pedidos.valor_total DESC
+        `).all();
     }
 
-    buscarPoriade(idade_usuario: number): usuarios[] {
-        const result = db.prepare('SELECT * FROM usuarios WHERE idade_usuario = ?').all(idade_usuario);
-        return result as usuarios[];
-    }
-
-    buscarPorCidade(cidade: string): usuarios[] {
-        const result = db.prepare('SELECT * FROM usuarios WHERE cidade = ?').all(cidade);
-        return result as usuarios[];
-    }
-
-    buscarPorEstado(estado: string): usuarios[] {
-        const result = db.prepare('SELECT * FROM usuarios WHERE estado = ?').all(estado);
-        return result as usuarios[];
+    buscarFretes() {
+        return db.prepare(`
+            SELECT usuarios.nome_usuario, fretes.cidade, fretes.valor, fretes.prazo
+            FROM fretes
+            JOIN pedidos ON fretes.id_pedido = pedidos.id_pedido
+            JOIN usuarios ON pedidos.nome_usuario = usuarios.nome_usuario
+            ORDER BY fretes.valor DESC
+        `).all();
     }
 }

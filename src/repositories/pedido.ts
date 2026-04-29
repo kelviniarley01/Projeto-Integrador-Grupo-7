@@ -3,28 +3,22 @@ import { pedido } from '../models/pedido';
 
 export class PedidosRepository {
 
-    listar(): pedido[] {
-        return db.prepare('SELECT * FROM pedidos').all() as pedido[];
+    salvar(p: pedido): pedido {
+        const r = db.prepare('INSERT INTO pedidos (id_usuarios, data, valor_total, status) VALUES (?, ?, ?, ?)')
+        .run(p.id_usuarios, p.data, p.valor_total, p.status);
+
+        return { ...p, id_pedido: r.lastInsertRowid as number };
     }
 
-    listarPorUsuario(nome: string): pedido[] {
-        return db
-            .prepare('SELECT * FROM pedidos WHERE nome_usuario = ?')
-            .all(nome) as pedido[];
+    listar() {
+        return db.prepare('SELECT * FROM pedidos').all();
     }
 
-    listarPorValor(valor: number): pedido[] {
-        return db
-            .prepare('SELECT * FROM pedidos WHERE valor_total > ?')
-            .all(valor) as pedido[];
+    listarPorUsuario(nome: string) {
+        return db.prepare('SELECT * FROM pedidos WHERE nome_usuario = ?').all(nome);
     }
 
-    buscarComUsuarios() {
-        return db.prepare(`
-            SELECT pedidos.id_pedido, usuarios.nome_usuario, pedidos.valor_total, pedidos.status
-            FROM pedidos
-            JOIN usuarios ON pedidos.nome_usuario = usuarios.nome_usuario
-            ORDER BY pedidos.valor_total DESC
-        `).all();
+    listarPorValor(valor: number) {
+        return db.prepare('SELECT * FROM pedidos WHERE valor_total > ?').all(valor);
     }
 }

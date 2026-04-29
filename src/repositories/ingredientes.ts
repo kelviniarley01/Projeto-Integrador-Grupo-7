@@ -2,14 +2,18 @@ import db from '../database/database';
 import { ingredientes } from '../models/ingredientes';
 
 export class IngredientesRepository {
+    salvar(i: ingredientes): ingredientes {
+        const r = db.prepare('INSERT INTO ingredientes (nome_ingredientes, tipo_ingredientes) VALUES (?, ?)')
+        .run(i.nome_ingredientes, i.tipo_ingredientes);
 
-    listar(): ingredientes[] {
-        return db.prepare('SELECT * FROM ingredientes').all() as ingredientes[];
+        return { ...i, id_ingredientes: r.lastInsertRowid as number };
     }
 
-    listarPorTipo(tipo: string): ingredientes[] {
-        return db
-            .prepare('SELECT * FROM ingredientes WHERE tipo = ?')
-            .all(tipo) as ingredientes[];
+    listar() {
+        return db.prepare('SELECT * FROM ingredientes').all();
+    }
+
+    listarPorTipo(tipo: string) {
+        return db.prepare('SELECT * FROM ingredientes WHERE tipo_ingredientes = ?').all(tipo);
     }
 }

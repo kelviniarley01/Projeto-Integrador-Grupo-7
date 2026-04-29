@@ -2,23 +2,18 @@ import db from '../database/database';
 import { pagamento } from '../models/pagamento';
 
 export class PagamentosRepository {
+    salvar(p: pagamento): pagamento {
+        const r = db.prepare('INSERT INTO pagamentos (id_pedido, tipo_pagamento, status_pagamento, valor_pagamento) VALUES (?, ?, ?, ?)')
+        .run(p.id_pedido, p.tipo_pagamento, p.status_pagamento, p.valor_pagamento);
 
-    listar(): pagamento[] {
-        return db.prepare('SELECT * FROM pagamentos').all() as pagamento[];
+        return { ...p, id_pagamento: r.lastInsertRowid as number };
     }
 
-    listarPorTipo(tipo: string): pagamento[] {
-        return db
-            .prepare('SELECT * FROM pagamentos WHERE tipo_pagamento = ?')
-            .all(tipo) as pagamento[];
+    listar() {
+        return db.prepare('SELECT * FROM pagamentos').all();
     }
 
-    buscarComPedidos() {
-        return db.prepare(`
-            SELECT pagamentos.tipo_pagamento, pagamentos.status_pagamento, pedidos.valor_total
-            FROM pagamentos
-            JOIN pedidos ON pagamentos.id_pedido = pedidos.id_pedido
-            ORDER BY pedidos.valor_total DESC
-        `).all();
+    listarPorTipo(tipo: string) {
+        return db.prepare('SELECT * FROM pagamentos WHERE tipo_pagamento = ?').all(tipo);
     }
 }

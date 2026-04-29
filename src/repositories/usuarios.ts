@@ -2,37 +2,22 @@ import db from '../database/database';
 import { usuarios } from '../models/usuarios';
 
 export class UsuariosRepository {
+    salvar(usuario: usuarios): usuarios {
+        const r = db.prepare('INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario, idade_usuario, data_nascimento_usuario, rua, numero, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .run(usuario.nome_usuario, usuario.email_usuario, usuario.senha_usuario, usuario.idade_usuario, usuario.data_nascimento_usuario, usuario.rua, usuario.numero, usuario.cidade, usuario.estado);
 
-    listar(): usuarios[] {
-        return db.prepare('SELECT * FROM usuarios').all() as usuarios[];
+        return { ...usuario, id_usuario: r.lastInsertRowid as number };
     }
 
-    listarPorCidade(cidade: string): usuarios[] {
-        return db.prepare('SELECT * FROM usuarios WHERE cidade = ?').all(cidade) as usuarios[];
+    listar() {
+        return db.prepare('SELECT * FROM usuarios').all();
     }
 
-    listarPorIdade(min: number, max: number): usuarios[] {
-        return db
-            .prepare('SELECT * FROM usuarios WHERE idade_usuario BETWEEN ? AND ? ORDER BY nome_usuario ASC')
-            .all(min, max) as usuarios[];
+    listarPorCidade(cidade: string) {
+        return db.prepare('SELECT * FROM usuarios WHERE cidade = ?').all(cidade);
     }
 
-    buscarPedidos() {
-        return db.prepare(`
-            SELECT pedidos.id_pedido, usuarios.nome_usuario, pedidos.valor_total, pedidos.status
-            FROM pedidos
-            JOIN usuarios ON pedidos.nome_usuario = usuarios.nome_usuario
-            ORDER BY pedidos.valor_total DESC
-        `).all();
-    }
-
-    buscarFretes() {
-        return db.prepare(`
-            SELECT usuarios.nome_usuario, fretes.cidade, fretes.valor, fretes.prazo
-            FROM fretes
-            JOIN pedidos ON fretes.id_pedido = pedidos.id_pedido
-            JOIN usuarios ON pedidos.nome_usuario = usuarios.nome_usuario
-            ORDER BY fretes.valor DESC
-        `).all();
+    listarPorIdade(min: number, max: number) {
+        return db.prepare('SELECT * FROM usuarios WHERE idade_usuario BETWEEN ? AND ? ORDER BY nome_usuario ASC').all(min, max);
     }
 }

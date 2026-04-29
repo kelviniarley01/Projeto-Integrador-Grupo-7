@@ -2,29 +2,18 @@ import db from '../database/database';
 import { itens_carrinhos } from '../models/itens_carrinhos';
 
 export class ItensCarrinhoRepository {
+    salvar(i: itens_carrinhos): itens_carrinhos {
+        const r = db.prepare('INSERT INTO item_carrinho (id_carrinho, nome_produto, quantidade, preco_unitario) VALUES (?, ?, ?, ?)')
+        .run(i.id_carrinho, i.nome_produto, i.quantidade, i.preco_unitario);
 
-    listar(): itens_carrinhos[] {
-        return db.prepare('SELECT * FROM item_carrinho').all() as itens_carrinhos[];
+        return { ...i, id_item: r.lastInsertRowid as number };
     }
 
-    listarPorQuantidade(): itens_carrinhos[] {
-        return db
-            .prepare('SELECT * FROM item_carrinho WHERE quantidade >= 1')
-            .all() as itens_carrinhos[];
+    listar() {
+        return db.prepare('SELECT * FROM item_carrinho').all();
     }
 
-    buscarPorProduto(nome: string): itens_carrinhos[] {
-        return db
-            .prepare('SELECT * FROM item_carrinho WHERE nome_produto = ?')
-            .all(nome) as itens_carrinhos[];
-    }
-
-    buscarPorProdutos() {
-        return db.prepare(`
-            SELECT item_carrinho.id_carrinho, produtos.nome_produto, item_carrinho.quantidade, item_carrinho.preco_unitario
-            FROM item_carrinho
-            JOIN produtos ON item_carrinho.nome_produto = produtos.nome_produto
-            ORDER BY item_carrinho.quantidade DESC
-        `).all();
+    buscarPorProduto(nome: string) {
+        return db.prepare('SELECT * FROM item_carrinho WHERE nome_produto = ?').all(nome);
     }
 }

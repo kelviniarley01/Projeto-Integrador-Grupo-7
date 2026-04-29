@@ -75,5 +75,8 @@ git clone https://github.com/seu-usuario/nome-do-repositorio
 # Acesse a pasta do projeto
 cd nome-do-repositorio
 
-# Instale as dependências e inicie o servidor
-npm install && npm run dev
+# Instale as dependências
+npm install
+
+#inicie o servidor#
+ && npm run dev

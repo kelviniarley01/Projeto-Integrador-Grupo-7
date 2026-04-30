@@ -76,7 +76,7 @@ git clone https://github.com/seu-usuario/nome-do-repositorio
 cd nome-do-repositorio
 
 # Instale as dependências
-npm install
+  npm install
 
 #inicie o servidor#
- && npm run dev
+  npm run dev

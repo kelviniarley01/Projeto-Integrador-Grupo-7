@@ -1,10 +1,10 @@
 import { app } from "../server";
-import { PagamentosRepository } from "../repositories/PagamentosRepository";
+import { PagamentoRepository } from "../repositories/pagamento";
 
-export function PagamentosController() {
-  const repository = new PagamentosRepository();
+export function PagamentoController() {
+  const repository = new PagamentoRepository();
 
-  app.get("/pagamentos", (requisite, response) => {
+  app.get("/pagamento", (requisite, response) => {
     const { tipo } = requisite.query;
 
     if (tipo) {
@@ -14,7 +14,7 @@ export function PagamentosController() {
     response.json(repository.listar());
   });
 
-  app.get("/pagamentos/:id", (requisite, response) => {
+  app.get("/pagamento/:id", (requisite, response) => {
     const id = Number(requisite.params.id);
     const pagamento = repository.buscarPorId(id);
 
@@ -25,9 +25,9 @@ export function PagamentosController() {
     response.json(pagamento);
   });
 
-  app.post("/pagamentos", (requisite, response) => {
+  app.post("/pagamento", (requisite, response) => {
     try {
-      const {id_pedido,tipo_pagamento,status_pagamento,valor_pagamento} = req.body;
+      const {id_pedido,tipo_pagamento,status_pagamento,valor_pagamento} = requisite.body;
 
       if (!id_pedido) throw new Error("Pedido obrigatório");
       if (!tipo_pagamento) throw new Error("Tipo de pagamento obrigatório");

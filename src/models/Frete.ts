@@ -4,7 +4,7 @@ export interface Frete  {
     valor: number;
     prazo: string;
     rua: string;
-    numero: string;
+    numero: number;
     cidade: string;
     estado: string;
 }

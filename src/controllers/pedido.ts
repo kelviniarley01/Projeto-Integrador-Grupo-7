@@ -1,8 +1,8 @@
 import { app } from "../server";
-import { pedidosRepository } from "../repositories/pedidoRepository";
+import { PedidosRepository } from "../repositories/pedido";
 
-export function pedidosController() {
-  const repository = new pedidosRepository();
+export function pedidoController() {
+  const repository = new PedidosRepository();
 
   app.get("/pedidos", (requisite, response) => {
     const { id_usuarios } = requisite.query;

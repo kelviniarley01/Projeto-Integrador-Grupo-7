@@ -1,5 +1,5 @@
 import { app } from "../server";
-import { ProdutosRepository } from "../repositories/ProdutosRepository";
+import { ProdutosRepository } from "../repositories/produtosRepository";
 
 export function ProdutosController() {
   const repository = new ProdutosRepository();

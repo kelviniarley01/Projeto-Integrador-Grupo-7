@@ -1,0 +1,301 @@
+#------USUARIOS ------------------------------------
+##Criar usuário
+POST https://localhost:3000/clientes
+Content-Type: application/json
+
+{
+    "nome_usuario": "Raphael",
+    "email_usuario": "raphael@example.com",
+    "senha_usuario": "senha123",
+    "idade_usuario": 30,
+    "data_nascimento_usuario": "2005-05-15",
+    "rua": "Rua das Flores",
+    "numero": 123,
+    "cidade": "Guarujá",
+    "estado": "SP",
+}
+
+###
+
+###Listar usuários
+GET http://localhost:3000/clientes
+
+###Buscar por ID
+GET http://localhost:3000/clientes/1
+
+###
+
+###Buscar por nome
+GET http://localhost:3000/clientes?nome_usuario=Raphael
+
+###
+
+#------PRODUTOS ------------------------------------
+##Criar produto
+POST http://localhost:3000/produtos
+Content-Type: application/json
+
+{
+    "nome_produto": "Hidratante Labial",
+    "descricao_produto": "Hidrata os lábios",
+    "preco_produto": 35.99,
+    "estoque_produto": 10
+}
+
+###
+
+###Listar produtos
+GET http://localhost:3000/produtos
+
+###
+
+###Buscar por ID
+GET http://localhost:3000/produtos/1
+
+###Buscar por nome
+GET http://localhost:3000/produtos?nome_produto=Hidratante%20Labial
+
+###
+
+#------PEDIDOS ------------------------------------
+##Criar pedido
+POST http://localhost:3000/pedidos
+Content-Type: application/json
+
+{
+    "id_usuarios": 1,
+    "data": "2026-05-05",
+    "valor_total": 50,
+    "status": "Pendente",
+}
+
+###
+
+###Listar pedidos
+GET http://localhost:3000/pedidos
+
+###Buscar por ID
+GET http://localhost:3000/pedidos/1
+
+###Buscar por usuário
+GET http://localhost:3000/pedidos?id_usuarios=1
+
+###
+
+#-------PAGAMENTOS ------------------------------------
+##Criar pagamento
+POST http://localhost:3000/pagamentos
+Content-Type: application/json
+
+{
+    "id_pedido": 1,
+    "tipo_pagamento": "Pix",
+    "status_pagamento": "Pago",
+    "valor_pagamento": 50
+}
+
+###
+
+###Listar pagamentos
+GET http://localhost:3000/pagamentos
+
+###Buscar por ID
+GET http://localhost:3000/pagamentos/1
+
+###Buscar por tipo de pagamento
+GET http://localhost:3000/pagamentos?tipo_pagamento=Pix
+
+###Buscar por status de pagamento
+GET http://localhost:3000/pagamentos?status_pagamento=Pago
+
+###
+
+#------CARRINHOS------------------------------------
+##Criar carrinho
+POST http://localhost:3000/carrinhos
+Content-Type: application/json
+
+{
+    "id_usuario": 1,
+    "preco_produto": 35.99,
+    "valor_frete": 5.99
+}
+
+###
+
+###Listar carrinhos
+GET http://localhost:3000/carrinhos
+
+###Buscar por ID
+GET http://localhost:3000/carrinhos/1
+
+###Buscar por usuário
+GET http://localhost:3000/carrinhos?id_usuario=1
+
+#---ITENS DE CARRINHO------------------------------------
+##Adicionar item ao carrinho
+POST http://localhost:3000/itens_carrinho
+Content-Type: application/json
+
+{
+    "id_carrinho": 1,
+    "nome_produto": "Hidratante Labial",
+    "quantidade": 2,
+    "preco_unitario": 35.99
+}
+
+###
+
+###Listar itens de carrinho
+GET http://localhost:3000/itens_carrinho
+
+###Buscar por ID
+GET http://localhost:3000/itens_carrinho/1
+
+###Buscar por carrinho
+GET http://localhost:3000/itens_carrinho?id_carrinho=1
+
+###
+
+#------ITEM DE PEDIDO------------------------------------
+##Adicionar item ao pedido
+POST http://localhost:3000/itens_pedido
+Content-Type: application/json
+
+{
+    "id_pedido": 1,
+    "id_produto": 1,
+    "quantidade": 1,
+    "preco": 35.99
+}
+
+###
+
+###Listar itens de pedido
+GET http://localhost:3000/itens_pedido
+
+###Buscar por ID
+GET http://localhost:3000/itens_pedido/1
+
+###Buscar por pedido
+GET http://localhost:3000/itens_pedido?id_pedido=1
+
+####
+
+#------INGREDIENTES------------------------------------
+##Criar ingrediente
+POST http://localhost:3000/ingredientes
+Content-Type: application/json
+
+{
+    "nome_ingredientes": "Hortelã",
+    "tipo_ingredientes": "planta",
+}
+
+###
+
+###Listar ingredientes
+GET http://localhost:3000/ingredientes
+
+###Buscar por tipo de ingrediente
+GET http://localhost:3000/ingredientes?tipo_ingredientes=planta
+
+#-----INGREDIENTES DE PRODUTO------------------------------------
+##Adicionar ingrediente a um produto
+POST http://localhost:3000/ingredientes_produto
+Content-Type: application/json
+
+{
+    "id_produto": 1,
+    "id_ingrediente": 1
+}
+
+###
+
+##Listar ingredientes de um produto
+GET http://localhost:3000/ingredientes_produto?id_produto=1
+
+###Buscar por produto
+GET http://localhost:3000/ingredientes_produto?id_produto=1
+
+#-------FRETE------------------------------------
+##Criar frete
+POST http://localhost:3000/fretes
+Content-Type: application/json
+
+{
+    "id_pedido": 1,
+    "valor_frete": 5.99,
+    "prazo_entrega": "3 dias",
+    "rua": "Rua das Flores",
+    "numero": 123,
+    "cidade": "Guarujá",
+    "estado": "SP",
+}
+
+###
+
+###Listar fretes
+GET http://localhost:3000/fretes
+
+### Buscar por cidade
+GET http://localhost:3000/fretes?cidade=Guarujá
+
+###
+
+#-----Loja------------------------------------
+##Criar loja
+POST http://localhost:3000/lojas
+Content-Type: application/json
+
+{
+    "id_loja": 1,
+    "nome": "Mentha Lab",
+    "descricao": "Loja de cosméticos"
+}
+
+###
+###Listar loja
+GET http://localhost:3000/loja
+
+### Buscar por nome
+GET http://localhost:3000/loja?nome=Mentha%20Lab
+
+#-----AJUDA------------------------------------
+##Criar ajuda
+POST http://localhost:3000/ajudas
+Content-Type: application/json
+
+{
+    "id_pergunta": 1,
+    "pergunta": "Como usar carrinho?",
+    "resposta": "Adicione produtos ao carrinho"
+}
+
+###
+###Listar ajuda
+GET http://localhost:3000/ajudas
+
+### Buscar por pergunta
+GET http://localhost:3000/ajudas?pergunta=Como%20usar%20carrinho%3F
+
+#----- ADMINISTRADOR ------------------------------------
+##Criar administrador
+POST http://localhost:3000/administradores
+Content-Type: application/json
+
+{
+    "nome_administrador": "Kelvin",
+    "email_administrador": "kelviniarley6@gmail.com",
+    "senha_administrador": "123456"
+}
+
+###
+
+###Listar administradores
+GET http://localhost:3000/administradores
+
+### Buscar por Nome
+GET http://localhost:3000/administradores?nome_administrador=Kelvin
+
+####

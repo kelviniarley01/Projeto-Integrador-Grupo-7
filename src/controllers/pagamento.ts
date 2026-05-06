@@ -1,46 +1,50 @@
-import { app } from "../server";
-import { PagamentoRepository } from "../repositories/pagamento";
+import { app } from "../app";
+import { PagamentosRepository } from "../repositories/pagamento";
+import { pagamento } from "../models/pagamento";
 
-export function PagamentoController() {
-  const repository = new PagamentoRepository();
+export function PagamentosController() {
+  const repository = new PagamentosRepository();
 
-  app.get("/pagamento", (requisite, response) => {
-    const { tipo } = requisite.query;
-
-    if (tipo) {
-      return response.json(repository.buscarPorTipo(tipo as string));
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/pagamento/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const pagamento = repository.buscarPorId(id);
-
-    if (!pagamento) {
-      return response.status(404).json({ erro: "Pagamento não encontrado" });
-    }
-
-    response.json(pagamento);
-  });
-
-  app.post("/pagamento", (requisite, response) => {
+  app.get("/pagamentos/tipo/:tipo", (request, response) => {
     try {
-      const {id_pedido,tipo_pagamento,status_pagamento,valor_pagamento} = requisite.body;
+      const { tipo } = request.params;
 
-      if (!id_pedido) throw new Error("Pedido obrigatório");
-      if (!tipo_pagamento) throw new Error("Tipo de pagamento obrigatório");
-      if (!status_pagamento) throw new Error("Status obrigatório");
-      if (!valor_pagamento || valor_pagamento <= 0) throw new Error("Valor inválido");
+      const lista = repository.listarPorTipo(tipo);
 
-      const pagamento = repository.salvar({id_pedido,tipo_pagamento,status_pagamento,valor_pagamento
-      });
-      response.status(201).json(pagamento);
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar pagamento"
+      return response.status(400).json({
+        erro: "Erro ao buscar pagamentos por tipo"
+      });
+    }
+  });
+
+  app.post("/pagamentos", (request, response) => {
+    try {
+      const {
+        id_pedido,
+        tipo_pagamento,
+        status_pagamento,
+        valor_pagamento
+      } = request.body;
+
+      const valor = Number(valor_pagamento);
+
+      if (!id_pedido) throw new Error("ID do pedido é obrigatório");
+      if (!tipo_pagamento) throw new Error("Tipo de pagamento é obrigatório");
+      if (!status_pagamento) throw new Error("Status do pagamento é obrigatório");
+      if (!valor || valor <= 0) throw new Error("Valor inválido");
+
+      const pagamento = {id_pedido,tipo_pagamento,status_pagamento,valor_pagamento: valor};
+
+      const pagamentoSalvo = repository.salvar;
+
+      return response.status(201).json(pagamentoSalvo);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar pagamento"
       });
     }
   });

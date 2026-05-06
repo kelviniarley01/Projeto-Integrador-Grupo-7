@@ -1,33 +1,25 @@
-import { app } from "../server";
+import { app } from "../app";
 import { UsuariosRepository } from "../repositories/usuarios";
+import { usuarios } from "../models/usuarios";
 
 export function UsuariosController() {
   const repository = new UsuariosRepository();
 
-  app.get("/usuarios", (requisite, response) => {
-    const { nome } = requisite.query;
+  app.get("/usuarios/:id", (request, response) => {
+    const id = Number(request.params.id);
 
-    if (nome) {
-      const usuario = repository.buscarPorNome(nome as string);
-      if (!usuario) return response.status(404).json({ erro: "Usuário não encontrado" });
-      return response.json(usuario);
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/usuarios/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
     const usuario = repository.buscarPorId(id);
 
-    if (!usuario) return response.status(404).json({ erro: "Usuário não encontrado" });
+    if (!usuario) {
+      return response.status(404).json({ erro: "Usuário não encontrado" });
+    }
 
-    response.json(usuario);
+    return response.json(usuario);
   });
 
-  app.post("/usuarios", (requisite, response) => {
+  app.post("/usuarios", (request, response) => {
     try {
-      const {nome_usuario,email_usuario,senha_usuario,idade_usuario,data_nascimento_usuario,rua,numero,cidade,estado } = requisite.body;
+      const {nome_usuario,email_usuario,senha_usuario,idade_usuario,data_nascimento_usuario,rua,numero,cidade,estado} = request.body;
 
       if (!nome_usuario) throw new Error("Nome obrigatório");
       if (!email_usuario || !email_usuario.includes("@")) throw new Error("Email inválido");
@@ -39,12 +31,14 @@ export function UsuariosController() {
       if (!cidade) throw new Error("Cidade é obrigatória");
       if (!estado) throw new Error("Estado é obrigatório");
 
-      const usuario = repository.salvar({nome_usuario,email_usuario,senha_usuario,idade_usuario,data_nascimento_usuario,rua,numero,cidade,estado
-      });
-      response.status(201).json(usuario);
+      const usuario: usuarios = {nome_usuario,email_usuario,senha_usuario,idade_usuario,data_nascimento_usuario,rua,numero,cidade,estado};
+
+      const novoUsuario = repository.salvar(usuario);
+
+      return response.status(201).json(novoUsuario);
 
     } catch (err) {
-      response.status(400).json({
+      return response.status(400).json({
         erro: err instanceof Error ? err.message : "Erro ao cadastrar usuário"
       });
     }

@@ -1,4 +1,4 @@
-import { app } from "../server";
+import { app } from "../app";
 import { AjudasRepository } from "../repositories/ajudas";
 
 export function AjudasController() {

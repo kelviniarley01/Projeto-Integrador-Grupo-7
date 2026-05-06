@@ -2,12 +2,10 @@ import Database from 'better-sqlite3';
 import path from "path";
 
 const db = new Database(path.join(__dirname, 'database.db'));
-const db = new Database(dbPath);
 
 db.pragma("foreign_keys = ON");
 
 db.exec(`
-
     CREATE TABLE IF NOT EXISTS usuarios (
         id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
         nome_usuario TEXT,
@@ -198,6 +196,6 @@ INSERT INTO informacoes_produto (nome_produto, beneficios, modo_uso, conservacao
 VALUES
 ('Hidratante Labial', 'Hidratar os lábios', 'aplique uma pequena quantidade sobre os lábios limpos, deslizando o bastão ou usando a ponta dos dedos, do centro para as bordas', 'guarde-o em locais frescos, secos e longe da luz');
 
-´);
+`);
 
 export default db;

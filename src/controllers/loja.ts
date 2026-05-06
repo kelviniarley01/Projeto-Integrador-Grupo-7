@@ -1,45 +1,50 @@
-import { app } from "../server";
+import { app } from "../app";
 import { LojaRepository } from "../repositories/loja";
 
 export function LojaController() {
   const repository = new LojaRepository();
 
-  app.get("/loja", (requisite, response) => {
-    const { nome } = requisite.query;
-
-    if (nome) {
-      const loja = repository.buscarPorNome(nome as string);
-      if (!loja) return response.status(404).json({ erro: "Loja não encontrada" });
-      return response.json(loja);
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/loja/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const loja = repository.buscarPorId(id);
-
-    if (!loja) return response.status(404).json({ erro: "Loja não encontrada" });
-
-    response.json(loja);
-  });
-
-  app.post("/loja", (requisite, response) => {
+  app.get("/lojas", (request, response) => {
     try {
-      const { id_loja, nome, descricao } = requisite.body;
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar lojas" });
+    }
+  });
 
-      if (!id_loja) throw new Error("ID obrigatório");
-      if (!nome) throw new Error("Nome obrigatório");
-      if (!descricao) throw new Error("Descrição obrigatória");
+  app.get("/lojas/nome/:nome", (request, response) => {
+    try {
+      const { nome } = request.params;
 
-      const loja = repository.salvar({id_loja,nome,descricao});
-      response.status(201).json(loja);
+      const loja = repository.buscarPorNome(nome);
+
+      if (!loja) {
+        return response.status(404).json({ erro: "Loja não encontrada" });
+      }
+
+      return response.json(loja);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar loja"
-      });
+      return response.status(400).json({ erro: "Erro ao buscar loja por nome" });
+    }
+  });
+
+  app.get("/lojas/ordenar/nome", (request, response) => {
+    try {
+      const lista = repository.listarPorNome();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(400).json({ erro: "Erro ao listar lojas por nome" });
+    }
+  });
+
+  app.get("/lojas/ordenar/id", (request, response) => {
+    try {
+      const lista = repository.listarPorId();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(400).json({ erro: "Erro ao listar lojas por ID" });
     }
   });
 }

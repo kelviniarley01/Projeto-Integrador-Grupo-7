@@ -1,43 +1,43 @@
-import { app } from "../server";
+import { app } from "../app";
 import { PedidosRepository } from "../repositories/pedido";
+import { pedido } from "../models/pedido";
 
-export function pedidoController() {
+export function PedidosController() {
   const repository = new PedidosRepository();
 
-  app.get("/pedidos", (requisite, response) => {
-    const { id_usuarios } = requisite.query;
-
-    if (id_usuarios) {
-      return response.json(repository.buscarPorUsuario(Number(id_usuarios)));
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/pedidos/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const pedido = repository.buscarPorId(id);
-
-    if (!pedido) return response.status(404).json({ erro: "Pedido não encontrado" });
-
-    response.json(pedido);
-  });
-
-  app.post("/pedidos", (requisite, response) => {
+  app.get("/pedidos/valor", (request, response) => {
     try {
-      const {id_usuarios,data,valor_total,status} = requisite.body;
+      const { valor } = request.query;
 
-      if (!id_usuarios) throw new Error("Usuário obrigatório");
-      if (!data) throw new Error("Data obrigatória");
-      if (!valor_total || valor_total <= 0) throw new Error("Valor inválido");
-      if (!status) throw new Error("Status obrigatório");
+      const lista = repository.listarPorValor(Number(valor));
 
-      const pedido = repository.salvar({id_usuarios,data,valor_total,status});
-      response.status(201).json(pedido);
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar pedido"
+      return response.status(400).json({
+        erro: "Erro ao filtrar por valor"
+      });
+    }
+  });
+
+  app.post("/pedidos", (request, response) => {
+    try {
+      const { id_usuarios, data, valor_total, status } = request.body;
+
+      if (!id_usuarios) throw new Error("ID do usuário é obrigatório");
+      if (!data) throw new Error("Data é obrigatória");
+      if (!valor_total || valor_total <= 0) throw new Error("Valor inválido");
+      if (!status) throw new Error("Status é obrigatório");
+
+      const novoPedido: pedido = {id_usuarios,data,valor_total,status};
+
+      const pedidoSalvo = repository.salvar(novoPedido);
+
+      return response.status(201).json(pedidoSalvo);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar pedido"
       });
     }
   });

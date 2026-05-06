@@ -17,7 +17,7 @@ export class LojaRepository {
             .all() as loja[];
     }
 
-    listarPorIdDesc(): loja[] {
+    listarPorId(): loja[] {
         return db
             .prepare('SELECT * FROM Loja ORDER BY id_loja DESC')
             .all() as loja[];

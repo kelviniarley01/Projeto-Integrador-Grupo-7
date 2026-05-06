@@ -1,4 +1,4 @@
-import { app } from "../server";
+import { app } from "../app";
 import { CarrinhosRepository } from "../repositories/carrinhos";
 
 export function CarrinhosController() {

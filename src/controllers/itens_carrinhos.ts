@@ -5,7 +5,6 @@ import { itens_carrinhos } from "../models/itens_carrinhos";
 export function ItensCarrinhosController() {
   const repository = new Itens_CarrinhosRepository();
 
-  // Listar todos os itens
   app.get("/itens-carrinho", (request, response) => {
     try {
       const lista = repository.listar();

@@ -22,12 +22,7 @@ export function PagamentosController() {
 
   app.post("/pagamentos", (request, response) => {
     try {
-      const {
-        id_pedido,
-        tipo_pagamento,
-        status_pagamento,
-        valor_pagamento
-      } = request.body;
+      const {id_pedido,tipo_pagamento,status_pagamento,valor_pagamento} = request.body;
 
       const valor = Number(valor_pagamento);
 

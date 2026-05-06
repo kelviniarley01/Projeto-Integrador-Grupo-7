@@ -1,28 +1,55 @@
 import { app } from "../app";
 import { FreteRepository } from "../repositories/Frete";
+import { Frete } from "../models/Frete";
 
 export function FreteController() {
   const repository = new FreteRepository();
 
-  app.post("/frete", (requisite, response) => {
+  app.get("/fretes", (request, response) => {
     try {
-      const {id_frete, id_pedido, valor, prazo, rua, numero, cidade, estado} = requisite.body;
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar fretes" });
+    }
+  });
 
-      if (!id_frete) throw new Error("ID do frete não pode ser fornecido");
-      if (!id_pedido) throw new Error("Pedido obrigatório");
-      if (!valor || valor <= 0) throw new Error("Valor inválido");
-      if (!prazo) throw new Error("Prazo obrigatório");
-      if (!rua) throw new Error("Rua obrigatória");
-      if (!numero) throw new Error("Número obrigatório");
-      if (!cidade) throw new Error("Cidade obrigatória");
-      if (!estado) throw new Error("Estado obrigatório");
+  app.get("/fretes/cidade/:cidade", (request, response) => {
+    try {
+      const { cidade } = request.params;
+      const lista = repository.listarPorCidade(cidade);
+      return response.json(lista);
+    } catch (err) {
+      return response.status(400).json({
+        erro: "Erro ao buscar fretes por cidade"
+      });
+    }
+  });
 
-      const frete = repository.salvar({id_frete, id_pedido, valor, prazo, rua, numero, cidade, estado});
-      response.status(201).json(frete);
+  app.post("/fretes", (request, response) => {
+    try {
+      const { id_pedido, valor, prazo, rua, numero, cidade, estado } = request.body;
+
+      const idPedido = Number(id_pedido);
+      const valorFrete = Number(valor);
+
+      if (!idPedido) throw new Error("ID do pedido é obrigatório");
+      if (!valorFrete || valorFrete <= 0) throw new Error("Valor inválido");
+      if (!prazo) throw new Error("Prazo é obrigatório");
+      if (!rua) throw new Error("Rua é obrigatória");
+      if (numero === undefined) throw new Error("Número é obrigatório");
+      if (!cidade) throw new Error("Cidade é obrigatória");
+      if (!estado) throw new Error("Estado é obrigatório");
+
+      const novoFrete: Frete = {id_pedido: idPedido,valor: valorFrete,prazo,rua,numero,cidade,estado};
+
+      const freteSalvo = repository.salvar(novoFrete);
+
+      return response.status(201).json(freteSalvo);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar frete"
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar frete"
       });
     }
   });

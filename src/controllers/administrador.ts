@@ -1,48 +1,63 @@
 import { app } from "../app";
 import { AdministradorRepository } from "../repositories/administrador";
+import { administrador } from "../models/administrador";
 
 export function AdministradorController() {
   const repository = new AdministradorRepository();
 
-  app.get("/administrador", (requisite, response) => {
-    const { nome } = requisite.query;
-
-    if (nome) {
-      const admin = repository.buscarPorNome(nome as string);
-      if (!admin) {
-        return response.status(404).json({ erro: "Administrador não encontrado" });
-      }
-      return response.json(admin);
+  app.get("/administradores", (request, response) => {
+    try {
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar administradores" });
     }
-
-    response.json(repository.listar());
   });
 
-  app.get("/administradores/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const admin = repository.buscarPorId(id);
+  app.get("/administradores/:id", (request, response) => {
+    const id = Number(request.params.id);
+
+    const admin = repository.listar().find(a => a.id_administrador === id);
 
     if (!admin) {
       return response.status(404).json({ erro: "Administrador não encontrado" });
     }
 
-    response.json(admin);
+    return response.json(admin);
   });
 
-  app.post("/administradores", (requisite, response) => {
+  app.get("/administradores/nome/:nome", (request, response) => {
     try {
-      const {nome_administrador,email_administrador,senha_administrador} = requisite.body;
+      const { nome } = request.params;
 
-      if (!nome_administrador) throw new Error("Nome obrigatório");
+      const lista = repository.buscarPorNome(nome);
+
+      return response.json(lista);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: "Erro ao buscar administrador por nome"
+      });
+    }
+  });
+
+  app.post("/administradores", (request, response) => {
+    try {
+      const {nome_administrador,email_administrador,senha_administrador} = request.body;
+
+      if (!nome_administrador) throw new Error("Nome é obrigatório");
       if (!email_administrador || !email_administrador.includes("@")) throw new Error("Email inválido");
       if (!senha_administrador || senha_administrador.length < 6) throw new Error("Senha inválida");
 
-      const admin = repository.salvar({nome_administrador,email_administrador,senha_administrador});
-      response.status(201).json(admin);
+      const novoAdmin: administrador = {nome_administrador,email_administrador,senha_administrador};
+
+      const adminSalvo = repository.salvar(novoAdmin);
+
+      return response.status(201).json(adminSalvo);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar administrador"
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar administrador"
       });
     }
   });

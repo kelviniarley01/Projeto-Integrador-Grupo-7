@@ -1,47 +1,50 @@
-import { app } from "../server";
+import { app } from "../app";
 import { IngredientesRepository } from "../repositories/ingredientes";
+import { ingredientes } from "../models/ingredientes";
 
 export function IngredientesController() {
   const repository = new IngredientesRepository();
 
-  app.get("/ingredientes", (requisite, response) => {
-    const { tipo } = requisite.query;
-
-    if (tipo) {
-      const ingredientes = repository.buscarPorTipo(tipo as string);
-      if (!ingredientes || ingredientes.length === 0) {
-        return response.status(404).json({ erro: "Nenhum ingrediente encontrado" });
-      }
-      return response.json(ingredientes);
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/ingredientes/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const ingrediente = repository.buscarPorId(id);
-
-    if (!ingrediente) {
-      return response.status(404).json({ erro: "Ingrediente não encontrado" });
-    }
-
-    response.json(ingrediente);
-  });
-
-  app.post("/ingredientes", (requisite, response) => {
+  app.get("/ingredientes", (request, response) => {
     try {
-      const {nome_ingredientes,tipo_ingredientes} = requisite.body;
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar ingredientes" });
+    }
+  });
 
-      if (!nome_ingredientes) throw new Error("Nome do ingrediente obrigatório");
-      if (!tipo_ingredientes) throw new Error("Tipo obrigatório");
+  app.get("/ingredientes/tipo/:tipo", (request, response) => {
+    try {
+      const { tipo } = request.params;
 
-      const ingrediente = repository.salvar({nome_ingredientes,tipo_ingredientes});
-      response.status(201).json(ingrediente);
+      const lista = repository.listarPorTipo(tipo);
+
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar ingrediente"
+      return response.status(400).json({
+        erro: "Erro ao buscar ingredientes por tipo"
+      });
+    }
+  });
+
+  app.post("/ingredientes", (request, response) => {
+    try {
+      const { nome_ingredientes, tipo_ingredientes } = request.body;
+
+      if (!nome_ingredientes) throw new Error("Nome do ingrediente é obrigatório");
+      if (!tipo_ingredientes) throw new Error("Tipo do ingrediente é obrigatório");
+
+      const novoIngrediente: ingredientes = {nome_ingredientes,tipo_ingredientes};
+
+      const ingredienteSalvo = repository.salvar(novoIngrediente);
+
+      return response.status(201).json(ingredienteSalvo);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar ingrediente"
       });
     }
   });

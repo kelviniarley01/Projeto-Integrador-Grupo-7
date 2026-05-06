@@ -1,49 +1,52 @@
-import { app } from "../server";
-import { Informações_ProdutoRepository } from "../repositories/informações_produto";
+import { app } from "../app";
+import { InformacoesProdutoRepository } from "../repositories/informações_produto";
+import { informacoes_Produto } from "../models/informações_produto";
 
-export function Informações_ProdutoController() {
-  const repository = new Informações_ProdutoRepository();
+export function InformacoesProdutoController() {
+  const repository = new InformacoesProdutoRepository();
 
-  app.get("/informacoes-produto", (requisite, response) => {
-    const { nome } = requisite.query;
-
-    if (nome) {
-      const info = repository.BuscarPorNome(nome as string);
-      if (!info || info.length === 0) {
-        return response.status(404).json({ erro: "Informações não encontradas" });
-      }
-      return response.json(info);
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/informacoes-produto/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const info = repository.BuscarPorId(id);
-
-    if (!info) {
-      return response.status(404).json({ erro: "Informação não encontrada" });
-    }
-
-    response.json(info);
-  });
-
-  app.post("/informacoes-produto", (requisite, response) => {
+  app.get("/informacoes-produto", (request, response) => {
     try {
-      const {nome_produto,beneficios,modo_uso,conservacao} = requisite.body;
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar informações" });
+    }
+  });
 
-      if (!nome_produto) throw new Error("Produto obrigatório");
-      if (!beneficios) throw new Error("Benefícios obrigatórios");
-      if (!modo_uso) throw new Error("Modo de uso obrigatório");
-      if (!conservacao) throw new Error("Conservação obrigatória");
+  app.get("/informacoes-produto/nome/:nome", (request, response) => {
+    try {
+      const { nome } = request.params;
 
-      const info = repository.salvar({nome_produto,beneficios,modo_uso,conservacao});
-      response.status(201).json(info);
+      const lista = repository.buscarPorNome(nome);
+
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar informações"
+      return response.status(400).json({
+        erro: "Erro ao buscar informações por nome"
+      });
+    }
+  });
+
+  app.post("/informacoes-produto", (request, response) => {
+    try {
+      const {nome_produto,beneficios,modo_uso,conservacao} = request.body;
+
+      if (!nome_produto) throw new Error("Nome do produto é obrigatório");
+      if (!beneficios) throw new Error("Benefícios são obrigatórios");
+      if (!modo_uso) throw new Error("Modo de uso é obrigatório");
+      if (!conservacao) throw new Error("Conservação é obrigatória");
+
+      const novaInfo: informacoes_Produto = {nome_produto,beneficios,modo_uso,conservacao};
+
+      const infoSalva = repository.salvar(novaInfo);
+
+      return response.status(201).json(infoSalva);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar informação do produto"
       });
     }
   });

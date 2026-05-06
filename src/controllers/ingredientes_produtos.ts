@@ -1,47 +1,55 @@
-import { app } from "../server";
+import { app } from "../app";
 import { IngredientesProdutosRepository } from "../repositories/ingredientes_produtos";
+import { ingredientes_produtos } from "../models/ingredientes_produtos";
 
 export function IngredientesProdutosController() {
   const repository = new IngredientesProdutosRepository();
 
-  app.get("/ingredientes_produto", (requisite, response) => {
-    const { id_produto } = requisite.query;
-
-    if (id_produto) {
-      const dados = repository.BuscarPorProduto(Number(id_produto));
-      if (!dados || dados.length === 0) {
-        return response.status(404).json({ erro: "Nenhum registro encontrado" });
-      }
-      return response.json(dados);
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/ingredientes_produto/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const dado = repository.BuscarPorId(id);
-
-    if (!dado) {
-      return response.status(404).json({ erro: "Registro não encontrado" });
-    }
-
-    response.json(dado);
-  });
-
-  app.post("/ingredientes_produto", (requisite, response) => {
+  app.get("/ingredientes-produtos", (request, response) => {
     try {
-      const {id_produto,id_ingredientes} = requisite.body;
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar vínculos" });
+    }
+  });
 
-      if (!id_produto) throw new Error("Produto obrigatório");
-      if (!id_ingredientes) throw new Error("Ingrediente obrigatório");
+  // Listar ingredientes por produto
+  app.get("/ingredientes-produtos/produto/:id_produto", (request, response) => {
+    try {
+      const id = Number(request.params.id_produto);
 
-      const dado = repository.salvar({id_produto,id_ingredientes});
-      response.status(201).json(dado);
+      if (isNaN(id)) {
+        return response.status(400).json({ erro: "ID inválido" });
+      }
+
+      const lista = repository.listarPorProduto(id);
+
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar"
+      return response.status(400).json({
+        erro: "Erro ao buscar ingredientes do produto"
+      });
+    }
+  });
+
+  app.post("/ingredientes-produtos", (request, response) => {
+    try {
+      const { id_produto, id_ingredientes } = request.body;
+
+      if (!id_produto) throw new Error("ID do produto é obrigatório");
+      if (!id_ingredientes) throw new Error("ID do ingrediente é obrigatório");
+
+      const novoVinculo: ingredientes_produtos = {id_produto,id_ingredientes};
+
+      const vinculoSalvo = repository.salvar(novoVinculo);
+
+      return response.status(201).json(vinculoSalvo);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar vínculo"
       });
     }
   });

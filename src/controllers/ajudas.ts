@@ -1,48 +1,63 @@
 import { app } from "../app";
 import { AjudasRepository } from "../repositories/ajudas";
+import { ajudas } from "../models/ajudas";
 
 export function AjudasController() {
   const repository = new AjudasRepository();
 
-  app.get("/ajudas", (requisite, response) => {
-    const { pergunta } = requisite.query;
-
-    if (pergunta) {
-      const ajudas = repository.buscarPorPergunta(pergunta as string);
-      if (!ajudas || ajudas.length === 0) {
-        return response.status(404).json({ erro: "Nenhuma ajuda encontrada" });
-      }
-      return response.json(ajudas);
+  app.get("/ajudas", (request, response) => {
+    try {
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar ajudas" });
     }
-
-    response.json(repository.listar());
   });
 
-  app.get("/ajudas/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const ajuda = repository.buscarPorId(id);
+  app.get("/ajudas/:id", (request, response) => {
+    const id = Number(request.params.id);
+
+    const ajuda = repository.listar().find(a => a.id_ajuda === id);
 
     if (!ajuda) {
       return response.status(404).json({ erro: "Ajuda não encontrada" });
     }
 
-    response.json(ajuda);
+    return response.json(ajuda);
   });
 
-  app.post("/ajudas", (requisite, response) => {
+  app.get("/ajudas/pergunta/:texto", (request, response) => {
     try {
-      const {id_pergunta,pergunta,resposta} = requisite.body;
+      const { texto } = request.params;
 
-      if (!id_pergunta) throw new Error("ID da pergunta obrigatório");
-      if (!pergunta) throw new Error("Pergunta obrigatória");
-      if (!resposta) throw new Error("Resposta obrigatória");
+      const lista = repository.buscarPorPergunta(texto);
 
-      const ajuda = repository.salvar({id_pergunta,pergunta,resposta});
-      response.status(201).json(ajuda);
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao cadastrar ajuda"
+      return response.status(400).json({
+        erro: "Erro ao buscar perguntas"
+      });
+    }
+  });
+
+  app.post("/ajudas", (request, response) => {
+    try {
+      const { id_pergunta, pergunta, resposta } = request.body;
+
+      if (!id_pergunta) throw new Error("ID da pergunta é obrigatório");
+      if (!pergunta) throw new Error("Pergunta é obrigatória");
+      if (!resposta) throw new Error("Resposta é obrigatória");
+
+      const novaAjuda: ajudas = {id_pergunta,pergunta,resposta};
+
+      const ajudaSalva = repository.salvar(novaAjuda);
+
+      return response.status(201).json(ajudaSalva);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar ajuda"
       });
     }
   });

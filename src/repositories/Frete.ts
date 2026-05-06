@@ -4,7 +4,7 @@ import { Frete } from '../models/Frete';
 export class FreteRepository {
 
     salvar(f: Frete): Frete {
-        const r = db.prepare('INSERT INTO fretes (id_frete ,id_pedido, valor, prazo, rua, numero, cidade, estado) VALUES (w,?, ?, ?, ?, ?, ?, ?)')
+        const r = db.prepare('INSERT INTO fretes (id_frete ,id_pedido, valor, prazo, rua, numero, cidade, estado) VALUES (?,?, ?, ?, ?, ?, ?, ?)')
         .run(f.id_frete, f.id_pedido, f.valor, f.prazo, f.rua, f.numero, f.cidade, f.estado);
 
         return { ...f, id_frete: r.lastInsertRowid as number };

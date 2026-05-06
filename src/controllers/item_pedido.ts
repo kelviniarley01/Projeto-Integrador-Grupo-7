@@ -1,43 +1,59 @@
-import { app } from "../server";
-import { item_PedidoRepository } from "../repositories/item_pedido";
+import { app } from "../app";
+import { ItemPedidoRepository } from "../repositories/item_pedido";
+import { item_pedido } from "../models/item_pedido";
 
-export function item_pedidoController() {
-  const repository = new item_PedidoRepository();
+export function ItemPedidoController() {
+  const repository = new ItemPedidoRepository();
 
-  app.get("/item_pedido", (requisite, response) => {
-    const { id_pedido } = requisite.query;
-
-    if (id_pedido) {
-      return response.json(repository.buscarPorPedido(Number(id_pedido)));
-    }
-
-    response.json(repository.listar());
-  });
-
-  app.get("/item_pedido/:id", (requisite, response) => {
-    const id = Number(requisite.params.id);
-    const item = repository.buscarPorId(id);
-
-    if (!item) return response.status(404).json({ erro: "Item do pedido não encontrado" });
-
-    response.json(item);
-  });
-
-  app.post("/item_pedido", (requisite, response) => {
+  app.get("/itens-pedido", (request, response) => {
     try {
-      const {id_pedido,id_produto,quantidade,preco} = requisite.body;
+      const lista = repository.listar();
+      return response.json(lista);
+    } catch (err) {
+      return response.status(500).json({ erro: "Erro ao listar itens de pedido" });
+    }
+  });
 
-      if (!id_pedido) throw new Error("Pedido obrigatório");
-      if (!id_produto) throw new Error("Produto obrigatório");
-      if (!quantidade || quantidade <= 0) throw new Error("Quantidade inválida");
-      if (!preco || preco <= 0) throw new Error("Preço inválido");
 
-      const item = repository.salvar({id_pedido,id_produto,quantidade,preco});
-      response.status(201).json(item);
+  app.get("/itens-pedido/pedido/:id_pedido", (request, response) => {
+    try {
+      const id = Number(request.params.id_pedido);
+
+      if (isNaN(id)) {
+        return response.status(400).json({ erro: "ID inválido" });
+      }
+
+      const lista = repository.listarPorPedido(id);
+
+      return response.json(lista);
 
     } catch (err) {
-      response.status(400).json({
-        erro: err instanceof Error ? err.message : "Erro ao adicionar item ao pedido"
+      return response.status(400).json({
+        erro: "Erro ao buscar itens do pedido"
+      });
+    }
+  });
+
+  app.post("/itens-pedido", (request, response) => {
+    try {
+      const {id_pedido,id_produto,quantidade,preco} = request.body;
+
+      const valor = Number(preco);
+
+      if (!id_pedido) throw new Error("ID do pedido é obrigatório");
+      if (!id_produto) throw new Error("ID do produto é obrigatório");
+      if (!quantidade || quantidade <= 0) throw new Error("Quantidade inválida");
+      if (!valor || valor <= 0) throw new Error("Preço inválido");
+
+      const novoItem: item_pedido = {id_pedido,id_produto,quantidade,preco: valor};
+
+      const itemSalvo = repository.salvar(novoItem);
+
+      return response.status(201).json(itemSalvo);
+
+    } catch (err) {
+      return response.status(400).json({
+        erro: err instanceof Error ? err.message : "Erro ao criar item do pedido"
       });
     }
   });

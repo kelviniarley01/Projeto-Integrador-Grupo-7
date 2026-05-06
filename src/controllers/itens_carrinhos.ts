@@ -15,7 +15,6 @@ export function ItensCarrinhosController() {
     }
   });
 
-  // Buscar itens por produto
   app.get("/itens-carrinho/produto/:nome", (request, response) => {
     try {
       const { nome } = request.params;
@@ -29,30 +28,18 @@ export function ItensCarrinhosController() {
     }
   });
 
-  // Criar item no carrinho
   app.post("/itens-carrinho", (request, response) => {
     try {
-      const {
-        id_carrinho,
-        nome_produto,
-        quantidade,
-        preco_unitario
-      } = request.body;
+      const {id_carrinho,nome_produto,quantidade,preco_unitario} = request.body;
 
       const preco = Number(preco_unitario);
 
-      // Validações
       if (!id_carrinho) throw new Error("ID do carrinho é obrigatório");
       if (!nome_produto) throw new Error("Nome do produto é obrigatório");
       if (!quantidade || quantidade <= 0) throw new Error("Quantidade inválida");
       if (!preco || preco <= 0) throw new Error("Preço inválido");
 
-      const novoItem: itens_carrinhos = {
-        id_carrinho,
-        nome_produto,
-        quantidade,
-        preco_unitario: preco
-      };
+      const novoItem: itens_carrinhos = {id_carrinho,nome_produto,quantidade,preco_unitario: preco};
 
       const itemSalvo = repository.salvar(novoItem);
 

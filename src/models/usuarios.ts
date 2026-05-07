@@ -4,7 +4,7 @@ export interface usuarios {
     email_usuario: string;
     senha_usuario: string;
     idade_usuario: number;
-    data_nascimento_usuario: Date;
+    data_cadastro_usuario: Date;
     rua: string;
     numero: string;
     cidade: string;

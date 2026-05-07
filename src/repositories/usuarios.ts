@@ -3,8 +3,8 @@ import { usuarios } from '../models/usuarios';
 
 export class UsuariosRepository {
     salvar(usuario: usuarios): usuarios {
-        const r = db.prepare('INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario, idade_usuario, data_nascimento_usuario, rua, numero, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-        .run(usuario.nome_usuario, usuario.email_usuario, usuario.senha_usuario, usuario.idade_usuario, usuario.data_nascimento_usuario, usuario.rua, usuario.numero, usuario.cidade, usuario.estado);
+        const r = db.prepare('INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario, idade_usuario, data_cadastro_usuario, rua, numero, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .run(usuario.nome_usuario, usuario.email_usuario, usuario.senha_usuario, usuario.idade_usuario, usuario.data_cadastro_usuario, usuario.rua, usuario.numero, usuario.cidade, usuario.estado);
 
         return { ...usuario, id_usuario: r.lastInsertRowid as number };
     }

@@ -9,7 +9,7 @@ Content-Type: application/json
     "email_usuario": "raphael@example.com",
     "senha_usuario": "senha123",
     "idade_usuario": 30,
-    "data_cadastro_usuario": "2026-05-05",
+    "data_cadastro_usuario": "2026-05-01",
     "rua": "Rua das Flores",
     "numero": "123",
     "cidade": "Guarujá",
@@ -21,15 +21,16 @@ Content-Type: application/json
 ### Listar usuários
 GET http://localhost:3000/usuarios
 
+
+######
+
+##Listar por cidade
+GET http://localhost:3000/usuarios?cidade=Guarujá 
+
 ###
 
-### Buscar por ID
-GET http://localhost:3000/usuarios/1
-
-###
-
-### Buscar por nome
-GET http://localhost:3000/usuarios?nome_usuario=Raphael
+### Buscar por idade
+GET http://localhost:3000/usuarios?idade_usuario=30
 
 
 # PRODUTOS-------------------------
@@ -42,7 +43,7 @@ Content-Type: application/json
     "nome_produto": "Hidratante Labial",
     "descricao_produto": "Hidrata os lábios",
     "preco_produto": 35.99,
-    "quantidade_produto": 10
+    "estoque": 50
 }
 
 ###
@@ -52,13 +53,8 @@ GET http://localhost:3000/produtos
 
 ###
 
-### Buscar por ID
-GET http://localhost:3000/produtos/1
-
-###
-
-### Buscar por nome
-GET http://localhost:3000/produtos?nome_produto=Hidratante%20Labial
+### Buscar por preço
+GET http://localhost:3000/produtos?preco_produto=35.99
 
 
 # PEDIDOS-------------------------
@@ -81,18 +77,11 @@ GET http://localhost:3000/pedidos
 
 ###
 
-### Buscar por ID
-GET http://localhost:3000/pedidos/1
-
-###
-
-### Buscar por usuário
+### Listar por usuário
 GET http://localhost:3000/pedidos?id_usuario=1
 
 
-# ─────────────────────────────────────────────
 # PAGAMENTOS
-# ─────────────────────────────────────────────
 
 ### Criar pagamento
 POST http://localhost:3000/pagamentos
@@ -110,25 +99,11 @@ Content-Type: application/json
 ### Listar pagamentos
 GET http://localhost:3000/pagamentos
 
-###
-
-### Buscar por ID
-GET http://localhost:3000/pagamentos/1
-
-###
-
 ### Buscar por tipo
 GET http://localhost:3000/pagamentos?tipo_pagamento=PIX
 
-###
 
-### Buscar por status
-GET http://localhost:3000/pagamentos?status_pagamento=APROVADO
-
-
-# ─────────────────────────────────────────────
 # CARRINHOS
-# ─────────────────────────────────────────────
 
 ### Criar carrinho
 POST http://localhost:3000/carrinhos
@@ -147,18 +122,13 @@ GET http://localhost:3000/carrinhos
 
 ###
 
-### Buscar por ID
-GET http://localhost:3000/carrinhos/1
-
-###
-
-### Buscar por usuário
+### Listar por usuário
 GET http://localhost:3000/carrinhos?id_usuario=1
 
+### Listar por frete
+GET http://localhost:3000/carrinhos?valor_frete=5.99
 
-# ─────────────────────────────────────────────
 # ITENS DO CARRINHO
-# ─────────────────────────────────────────────
 
 ### Adicionar item ao carrinho
 POST http://localhost:3000/itens-carrinho
@@ -166,8 +136,9 @@ Content-Type: application/json
 
 {
     "id_carrinho": 1,
-    "id_produto": 1,
-    "quantidade": 2
+    "nome_produto": "Hidratante Labial",
+    "quantidade": 2,
+    "preco": 35.99
 }
 
 ###
@@ -175,20 +146,12 @@ Content-Type: application/json
 ### Listar itens do carrinho
 GET http://localhost:3000/itens-carrinho
 
-###
 
-### Buscar por ID
-GET http://localhost:3000/itens-carrinho/1
-
-###
-
-### Buscar por carrinho
-GET http://localhost:3000/itens-carrinho?id_carrinho=1
+### Listar por produto
+GET http://localhost:3000/itens-carrinho?nome_produto=Hidratante%20Labial
 
 
-# ─────────────────────────────────────────────
 # ITENS DO PEDIDO
-# ─────────────────────────────────────────────
 
 ### Adicionar item ao pedido
 POST http://localhost:3000/itens-pedido
@@ -206,20 +169,11 @@ Content-Type: application/json
 ### Listar itens do pedido
 GET http://localhost:3000/itens-pedido
 
-###
 
-### Buscar por ID
-GET http://localhost:3000/itens-pedido/1
-
-###
-
-### Buscar por pedido
+### Listar por pedido
 GET http://localhost:3000/itens-pedido?id_pedido=1
 
-
-# ─────────────────────────────────────────────
 # INGREDIENTES
-# ─────────────────────────────────────────────
 
 ### Criar ingrediente
 POST http://localhost:3000/ingredientes
@@ -237,7 +191,7 @@ GET http://localhost:3000/ingredientes
 
 ###
 
-### Buscar por tipo
+### Listar por tipo
 GET http://localhost:3000/ingredientes?tipo_ingrediente=planta
 
 
@@ -285,13 +239,10 @@ GET http://localhost:3000/fretes
 
 ###
 
-### Buscar por cidade
+### Listar por cidade
 GET http://localhost:3000/fretes?cidade=Guarujá
 
-
-# ─────────────────────────────────────────────
 # LOJA
-# ─────────────────────────────────────────────
 
 ### Criar loja
 POST http://localhost:3000/loja
@@ -312,6 +263,12 @@ GET http://localhost:3000/loja
 ### Buscar por nome
 GET http://localhost:3000/loja?nome_loja=Mentha%20Lab
 
+### Listar por nome
+GET http://localhost:3000/loja?nome_loja=Mentha%20Lab
+
+### Listar por ID
+GET http://localhost:3000/loja?id_loja=1
+
 
 # ─────────────────────────────────────────────
 # AJUDAS
@@ -322,6 +279,8 @@ POST http://localhost:3000/ajudas
 Content-Type: application/json
 
 {
+    "id_ajuda": 1,
+    "id_pergunta": 1,
     "pergunta": "Como usar carrinho?",
     "resposta": "Adicione produtos ao carrinho"
 }

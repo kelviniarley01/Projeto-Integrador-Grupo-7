@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email_usuario TEXT UNIQUE NOT NULL,
     senha_usuario TEXT NOT NULL,
     idade_usuario INTEGER,
-    data_cadastro_usuario TEXT,
+    data_cadastro_usuario datetime,
     rua TEXT,
     numero TEXT,
     cidade TEXT,

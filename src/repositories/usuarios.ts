@@ -19,9 +19,13 @@ export class UsuariosRepository {
 
     listarPorIdade(min: number, max: number) {
         return db.prepare('SELECT * FROM usuarios WHERE idade_usuario BETWEEN ? AND ? ORDER BY nome_usuario ASC').all(min, max);
-    } 
-     buscarPorId(id: number): usuarios | null {
-    return (db.prepare("SELECT * FROM usuarios WHERE id = ?").get(id) as usuarios) ?? null;
-  }
+    }
 
+    buscarPorId(id: number): usuarios | null {
+        return (db.prepare('SELECT * FROM usuarios WHERE id_usuario = ?').get(id) as usuarios) ?? null;
+    }
+
+    buscarPorEmail(email: string): usuarios | null {
+        return (db.prepare('SELECT * FROM usuarios WHERE email_usuario = ?').get(email) as usuarios) ?? null;
+    }
 }

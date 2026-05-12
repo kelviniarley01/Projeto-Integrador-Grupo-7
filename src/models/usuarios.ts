@@ -3,10 +3,10 @@ export interface usuarios {
     nome_usuario: string;
     email_usuario: string;
     senha_usuario: string;
-    idade_usuario: number;
-    data_cadastro_usuario: Date;
-    rua: string;
-    numero: string;
-    cidade: string;
-    estado: string;
+    idade_usuario?: number;
+    data_cadastro_usuario?: string;
+    rua?: string;
+    numero?: string;
+    cidade?: string;
+    estado?: string;
 }

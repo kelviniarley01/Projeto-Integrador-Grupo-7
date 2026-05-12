@@ -121,4 +121,12 @@ CREATE TABLE IF NOT EXISTS informacoes_produto (
 );
 `);
 
+// Seed dos produtos do catálogo (IDs fixos para bater com o frontend estático)
+db.exec(`
+INSERT OR IGNORE INTO produtos (id_produto, nome_produto, descricao_produto, preco_produto, quantidade_produto) VALUES
+  (1, 'Lip Balm Hortelã Natural',       'Hidratação refrescante 24h com hortelã natural.',              35.99, 100),
+  (2, 'Lip Balm Hortelã Kids',           'Fórmula suave e segura para crianças a partir de 3 anos.',     29.90, 100),
+  (3, 'Kit Lip Balm Hortelã + Espátula', 'Pote de 3,7g acompanhado de espátula de silicone higiênica.', 42.90, 100);
+`);
+
 export default db;
